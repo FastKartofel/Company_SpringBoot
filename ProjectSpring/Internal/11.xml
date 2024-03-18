@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="21.0.1" class="java.beans.XMLDecoder">
+ <object class="com.example.ProjectSpring.models.Person">
+  <void property="email">
+   <string>fiona.m@example.com</string>
+  </void>
+  <void property="firstName">
+   <string>Fiona</string>
+  </void>
+  <void property="lastName">
+   <string>Miles</string>
+  </void>
+  <void property="mobile">
+   <string>555789012</string>
+  </void>
+  <void property="personType">
+   <object class="java.lang.Enum" method="valueOf">
+    <class>com.example.ProjectSpring.models.PersonType</class>
+    <string>INTERNAL</string>
+   </object>
+  </void>
+  <void property="pesel">
+   <string>96045612378</string>
+  </void>
+ </object>
+</java>
