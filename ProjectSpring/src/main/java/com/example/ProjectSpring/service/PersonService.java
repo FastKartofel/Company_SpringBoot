@@ -4,10 +4,7 @@ import com.example.ProjectSpring.models.Person;
 import com.example.ProjectSpring.models.PersonType;
 import com.example.ProjectSpring.interfaces.IPersonService;
 import java.beans.XMLEncoder;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,9 +17,16 @@ public class PersonService implements IPersonService {
 
     @Override
     public void savePerson(Person person) throws IOException {
+        boolean exists = people.stream()
+                .anyMatch(p -> p.getPersonId() == person.getPersonId());
+
+        if(exists) {
+            throw new IOException("Person with this ID already exists");
+        }
         people.add(person);
         String directoryPath = person.getPersonType() == PersonType.INTERNAL ? "Internal" : "External";
         File directory = new File(directoryPath);
+
         if (!directory.exists()) {
             directory.mkdirs();
         }
@@ -44,7 +48,7 @@ public class PersonService implements IPersonService {
     }
 
     @Override
-    public boolean removePerson(int personId) {
+    public String removePerson(int personId) {
         Person personToRemove = people.stream()
                 .filter(person -> person.getPersonId() == personId)
                 .findFirst()
@@ -56,13 +60,15 @@ public class PersonService implements IPersonService {
             String directoryPath = personToRemove.getPersonType() == PersonType.INTERNAL ? "Internal" : "External";
             File file = new File(directoryPath, personToRemove.getPersonId() + ".xml");
             if (file.exists()) {
-                file.delete();
+                boolean isDeleted = file.delete();
+                if (!isDeleted) {
+                    System.err.println("Failed to delete file: " + file.getPath());
+                }
             }
 
-            return true;
+            return "Person removed successfully!";
         }
-
-        return false;
+        return "Person not found!";
     }
 
     @Override
@@ -70,6 +76,16 @@ public class PersonService implements IPersonService {
         for(int i =0; i< people.size(); i++){
             if(people.get(i).getPersonId() == person.getPersonId()){
                 people.set(i, person);
+
+                // Save the updated person back to the XML file
+                String directoryPath = person.getPersonType() == PersonType.INTERNAL ? "Internal" : "External";
+                File file = new File(directoryPath, person.getPersonId() + ".xml");
+                try (XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(file)))) {
+                    encoder.writeObject(person);
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+
                 break;
             }
         }

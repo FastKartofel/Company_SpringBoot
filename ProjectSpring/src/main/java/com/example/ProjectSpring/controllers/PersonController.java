@@ -35,14 +35,13 @@ public class PersonController {
         return new ResponseEntity<>(foundPeople, HttpStatus.OK);
     }
 
-
     @DeleteMapping("/remove/{personId}")
     public ResponseEntity<String> removePerson(@PathVariable Integer personId) {
-        boolean isRemoved = personService.removePerson(personId);
-        if (isRemoved) {
-            return new ResponseEntity<>("Person removed successfully!", HttpStatus.OK);
+        String message = personService.removePerson(personId);
+        if (message.equals("Person removed successfully!")) {
+            return new ResponseEntity<>(message, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("Person not found!", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
         }
     }
 

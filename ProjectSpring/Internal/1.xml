@@ -2,16 +2,16 @@
 <java version="21.0.1" class="java.beans.XMLDecoder">
  <object class="com.example.ProjectSpring.models.Person">
   <void property="email">
-   <string>diana.w@example.com</string>
+   <string>moral.m@example.com</string>
   </void>
   <void property="firstName">
-   <string>Diana</string>
+   <string>John</string>
   </void>
   <void property="lastName">
-   <string>Wright</string>
+   <string>Morales</string>
   </void>
   <void property="mobile">
-   <string>555321987</string>
+   <string>555777888</string>
   </void>
   <void property="personType">
    <object class="java.lang.Enum" method="valueOf">
@@ -20,7 +20,7 @@
    </object>
   </void>
   <void property="pesel">
-   <string>94032165498</string>
+   <string>76045612378</string>
   </void>
  </object>
 </java>

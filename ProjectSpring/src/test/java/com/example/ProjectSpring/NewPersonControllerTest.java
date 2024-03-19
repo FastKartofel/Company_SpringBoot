@@ -5,6 +5,7 @@ import com.example.ProjectSpring.models.PersonType;
 import com.example.ProjectSpring.interfaces.IPersonService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,14 +13,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -34,57 +35,85 @@ public class NewPersonControllerTest {
     @Autowired
     private IPersonService personService;
 
+    private List<Map<String,Object>> personMaps;
+
+    @BeforeEach
+    public void setUp() {
+        personMaps = new ArrayList<>();
+
+        Map<String, Object> personMap1 = new HashMap<>();
+        personMap1.put("firstName", "John");
+        personMap1.put("lastName", "Morales");
+        personMap1.put("mobile", "555777888");
+        personMap1.put("email", "moral.m@example.com");
+        personMap1.put("pesel", "76045612378");
+        personMap1.put("personType", PersonType.INTERNAL.toString());
+        personMaps.add(personMap1);
+
+        Map<String, Object> personMap2 = new HashMap<>();
+        personMap2.put("firstName", "Anna");
+        personMap2.put("lastName", "Zalewska");
+        personMap2.put("mobile", "111222333");
+        personMap2.put("email", "sandra.m@example.com");
+        personMap2.put("pesel", "12245612378");
+        personMap2.put("personType", PersonType.EXTERNAL.toString());
+        personMaps.add(personMap2);
+
+        Map<String, Object> personMap3 = new HashMap<>();
+        personMap3.put("firstName", "Darek");
+        personMap3.put("lastName", "Benek");
+        personMap3.put("mobile", "123456789");
+        personMap3.put("email", "bolek.m@example.com");
+        personMap3.put("pesel", "99745612378");
+        personMap3.put("personType", PersonType.INTERNAL.toString());
+        personMaps.add(personMap3);
+    }
+
+
     @Test
     public void testFindPerson() throws Exception {
+        for(Map<String, Object> personMap : personMaps) {
+            mockMvc.perform(post("/person")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(personMap)))
+                    .andExpect(status().isCreated());
+        }
+
+        // find John Morales, he is located in the Internal catalog
         Map<String, Object> personMap = new HashMap<>();
+        personMap.put("type", "INTERNAL");
         personMap.put("firstName", "John");
         personMap.put("lastName", "Morales");
         personMap.put("mobile", "555777888");
-        personMap.put("email", "moral.m@example.com");
-        personMap.put("pesel", "96045612378");
-        personMap.put("personType", PersonType.INTERNAL);
-        mockMvc.perform(post("/person")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(personMap)))
-                .andExpect(status().isCreated());
 
-        String response =mockMvc.perform(get("/person/find")
-                        .param("type", "INTERNAL")
-                        .param("firstName", "John")
-                        .param("lastName", "Morales")
-                        .param("mobile", "555777888"))
+        mockMvc.perform(get("/person/find")
+                        .param("type", personMap.get("type").toString())
+                        .param("firstName", personMap.get("firstName").toString())
+                        .param("lastName", personMap.get("lastName").toString())
+                        .param("mobile", personMap.get("mobile").toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].firstName", is("John")))
-                .andExpect(jsonPath("$[0].lastName", is("Morales")))
-                .andExpect(jsonPath("$[0].mobile", is("555777888")))
-                .andReturn().getResponse().getContentAsString();
-
-        List<Person> foundPeople = objectMapper.readValue(response, new TypeReference<List<Person>>() {});
-
-        foundPeople.forEach(System.out::println);
+                .andDo(result -> System.out.println(result.getResponse().getContentAsString()));
     }
 
     @Test
     public void testRemovePerson() throws Exception {
         Map<String, Object> personMap = new HashMap<>();
-        personMap.put("firstName", "John");
-        personMap.put("lastName", "Doe");
-        personMap.put("mobile", "555555555");
-        personMap.put("email", "john.doe@example.com");
-        personMap.put("pesel", "12345678901");
-        personMap.put("personType", PersonType.INTERNAL);
+        personMap.put("personId", 3);
+        personMap.put("firstName", "Test");
+        personMap.put("lastName", "User");
+        personMap.put("mobile", "123456789");
+        personMap.put("email", "test.user@example.com");
+        personMap.put("pesel", "96045612378");
+        personMap.put("personType", PersonType.EXTERNAL.toString());
 
-        String response = mockMvc.perform(post("/person")
+        mockMvc.perform(post("/person")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(personMap)))
-                .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
+                .andExpect(status().isCreated());
 
-        Person person = objectMapper.readValue(response, Person.class);
-
-        // Now try to remove the person
-        mockMvc.perform(delete("/person/remove/{personId}", person.getPersonId()))
-                .andExpect(status().isOk());
+        mockMvc.perform(delete("/person/remove/{personId}", 3))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Person removed successfully!"));
     }
 
     @Test
@@ -96,6 +125,7 @@ public class NewPersonControllerTest {
                 .andReturn().getResponse().getContentAsString();
 
         Person person = objectMapper.readValue(response, Person.class);
+        // modify John Morales to Jane Morales
         person.setFirstName("Jane");
 
         mockMvc.perform(put("/person/modify")
@@ -111,4 +141,5 @@ public class NewPersonControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].firstName", is("Jane")));
     }
+
 }

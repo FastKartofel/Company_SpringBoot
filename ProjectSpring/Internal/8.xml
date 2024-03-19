@@ -2,25 +2,25 @@
 <java version="21.0.1" class="java.beans.XMLDecoder">
  <object class="com.example.ProjectSpring.models.Person">
   <void property="email">
-   <string>charlie.b@example.com</string>
+   <string>moral.m@example.com</string>
   </void>
   <void property="firstName">
-   <string>Charlie</string>
+   <string>Jane</string>
   </void>
   <void property="lastName">
-   <string>Brown</string>
+   <string>Morales</string>
   </void>
   <void property="mobile">
-   <string>555654321</string>
+   <string>555777888</string>
   </void>
   <void property="personType">
    <object class="java.lang.Enum" method="valueOf">
     <class>com.example.ProjectSpring.models.PersonType</class>
-    <string>EXTERNAL</string>
+    <string>INTERNAL</string>
    </object>
   </void>
   <void property="pesel">
-   <string>93078912345</string>
+   <string>96045612378</string>
   </void>
  </object>
 </java>

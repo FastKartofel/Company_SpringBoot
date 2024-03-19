@@ -5,7 +5,6 @@ import com.example.ProjectSpring.IdGenerator;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Person {
-
     // Static counter to ensure unique ID generation
     private static final IdGenerator ID_GENERATOR = new IdGenerator();
     private Integer personId;

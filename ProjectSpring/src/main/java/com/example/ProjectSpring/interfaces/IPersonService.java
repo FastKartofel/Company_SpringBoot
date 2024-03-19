@@ -11,7 +11,7 @@ public interface IPersonService {
 
     List<Person> find(PersonType personType, String firstName, String lastName, String mobile);
 
-    boolean removePerson(int personId);
+    String removePerson(int personId);
 
     void modify(Person person);
 }
